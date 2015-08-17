@@ -107,8 +107,13 @@ keyData =
      "discovered that the spark's thunk was no longer needed anywhere. " ++
      "In the spark conversion graph the coloured area represents the number " ++
      "of sparks that were GC'd.")
+  , ("Start TX",        KEventAndGraph, userMessageColour, "Start TX Event")
+  , ("Commit TX", KEventAndGraph, userMessageColour, "Commit TX Event")
+  , ("Eager Partial Abort", KEventAndGraph, fizzledDudsColour, "Eager Partial Abort")
+  , ("Commit Time Partial Abort", KEventAndGraph, fizzledDudsColour, "Commit Time Partial Abort")
+  , ("Eager Full Abort", KEventAndGraph, shutdownColour, "Eager Full Abort")
+  , ("Commit Time Full Abort", KEventAndGraph, shutdownColour, "Eager Full Abort")
   ]
-
 
 createKeyEntries :: DrawableClass dw
                  => dw

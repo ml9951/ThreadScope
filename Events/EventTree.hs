@@ -131,6 +131,7 @@ splitDurationList (e:es) acc !tsplit !tmax
 runTimeOf :: DurationTree -> Timestamp
 runTimeOf (DurationSplit _ _ _ _ _ runTime _) = runTime
 runTimeOf (DurationTreeLeaf e) | ThreadRun{} <- e = durationOf e
+runTimeOf (DurationTreeLeaf e) | TXStart {} <- e = durationOf e
 runTimeOf _ = 0
 
 -------------------------------------------------------------------------------

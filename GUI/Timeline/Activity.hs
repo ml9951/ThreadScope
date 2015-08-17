@@ -81,7 +81,7 @@ actProfile slice start0 end0 t
    chop sofar start (t : ts)
      | e <= start
      = if sofar /= 0
-          then error "chop"
+          then error ("chop: sofar = " ++ show sofar ++ ", e = " ++ show e ++ ", start = " ++ show start) 
           else chop sofar start ts
      | s >= start + slice
      = sofar : chop 0 (start + slice) (t : ts)

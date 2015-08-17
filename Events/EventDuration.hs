@@ -35,6 +35,9 @@ data EventDuration
 
   | GCEnd   {-#UNPACK#-}!Timestamp
             {-#UNPACK#-}!Timestamp
+  | TXStart {-#UNPACK#-}!Timestamp
+            {-#UNPACK#-}!Timestamp
+
   deriving Show
 
 {-
@@ -62,6 +65,7 @@ startTimeOf ed
       GCWork  startTime _       -> startTime
       GCIdle  startTime _       -> startTime
       GCEnd   startTime _       -> startTime
+      TXStart startTime _       -> startTime
 
 -------------------------------------------------------------------------------
 -- The emd time of an event.
@@ -74,6 +78,7 @@ endTimeOf ed
       GCWork  _ endTime       -> endTime
       GCIdle  _ endTime       -> endTime
       GCEnd   _ endTime       -> endTime
+      TXStart _ endTime       -> endTime
 
 -------------------------------------------------------------------------------
 -- The duration of an EventDuration
@@ -91,6 +96,8 @@ eventsToDurations (event : events) =
      StopThread{}  -> rest
      StartGC       -> gcStart (time event) events
      EndGC{}       -> rest
+--     StartTX       -> txStart (time event) events
+ --    CommitTX      -> rest
      _otherEvent   -> rest
   where
     rest = eventsToDurations events
@@ -107,11 +114,22 @@ isDiscreteEvent e =
     StopThread{} -> False
     StartGC{}    -> False
     EndGC{}      -> False
+ --   StartTX{}    -> False
+  --  CommitTX{}   -> False
     GHC.GCWork{} -> False
     GHC.GCIdle{} -> False
     GHC.GCDone{} -> False
     GHC.SparkCounters{} -> False
     _            -> True
+
+txStart :: Timestamp -> [GHC.Event] -> [EventDuration]
+txStart _ [] = []
+txStart t0 (event : events) = 
+  case spec event of
+    GHC.CommitTX{} -> TXStart t0 t1 : eventsToDurations events
+    _other         -> gcStart t0 events
+  where
+      t1 = time event
 
 gcStart :: Timestamp -> [GHC.Event] -> [EventDuration]
 gcStart _  [] = []

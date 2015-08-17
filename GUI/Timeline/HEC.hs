@@ -217,6 +217,18 @@ drawDuration ViewParameters{..} (GCIdle startTime endTime)
 drawDuration ViewParameters{..} (GCEnd startTime endTime)
   = gcBar (if bwMode then black else gcEndColour) startTime endTime
 
+drawDuration ViewParameters{..} (TXStart startTime endTime)
+  = txBar (if bwMode then black else txStartColour) startTime endTime
+
+txBar :: Color -> Timestamp -> Timestamp -> Render ()
+txBar col !startTime !endTime = do
+  setSourceRGBAhex col 1.0
+  draw_rectangle_opt False
+                     startTime                      -- x
+                     (hecBarOff+hecBarHeight)       -- y
+                     (endTime - startTime)          -- w
+                     (hecBarHeight `div` 2)         -- h
+
 gcBar :: Color -> Timestamp -> Timestamp -> Render ()
 gcBar col !startTime !endTime = do
   setSourceRGBAhex col 1.0
@@ -257,6 +269,13 @@ drawEvent params@ViewParameters{..} ewidth perfNames event =
     SparkSteal{}    -> renderI createdConvertedColour
     SparkFizzle{}   -> renderI fizzledDudsColour
     SparkGC{}       -> renderI gcColour
+
+    StartTX{}       -> renderI userMessageColour
+    CommitTX{}      -> renderI userMessageColour
+    EagerPartialAbort{} -> renderI fizzledDudsColour
+    CommitTimePartialAbort{} -> renderI fizzledDudsColour
+    EagerFullAbort{} -> renderI shutdownColour
+    CommitTimeFullAbort{} -> renderI shutdownColour
 
     UserMessage{}   -> renderI userMessageColour
 

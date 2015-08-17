@@ -24,6 +24,9 @@ gcWorkColour  = orange
 gcIdleColour  = white
 gcEndColour   = orange
 
+txStartColour :: Color
+txStartColour = yellow
+
 createThreadColour :: Color
 createThreadColour = lightBlue
 
