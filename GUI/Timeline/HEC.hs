@@ -271,7 +271,7 @@ drawEvent params@ViewParameters{..} ewidth perfNames event =
     SparkGC{}       -> renderI gcColour
 
     StartTX{}       -> renderI userMessageColour
-    StartTXWithInfo{} -> renderI userMessageColour
+    StartTXWInfo{} -> renderI userMessageColour
     CommitTX{}      -> renderI userMessageColour
     EagerPartialAbort{} -> renderI fizzledDudsColour
     CommitTimePartialAbort{} -> renderI fizzledDudsColour
