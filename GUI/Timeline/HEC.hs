@@ -270,13 +270,16 @@ drawEvent params@ViewParameters{..} ewidth perfNames event =
     SparkFizzle{}   -> renderI fizzledDudsColour
     SparkGC{}       -> renderI gcColour
 
-    StartTX{}       -> renderI userMessageColour
-    StartTXWInfo{} -> renderI userMessageColour
+--BEGIN STM
+    StartTX{}       -> renderI seqGCReqColour
+    StartTXWInfo{} -> renderI seqGCReqColour
     CommitTX{}      -> renderI userMessageColour
     EagerPartialAbort{} -> renderI fizzledDudsColour
     CommitTimePartialAbort{} -> renderI fizzledDudsColour
     EagerFullAbort{} -> renderI shutdownColour
     CommitTimeFullAbort{} -> renderI shutdownColour
+    BeginCommit{} -> renderI parGCReqColour
+--END STM
 
     UserMessage{}   -> renderI userMessageColour
 
