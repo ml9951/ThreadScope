@@ -65,48 +65,6 @@ keyData =
      "Indicates a period of time spent by the RTS performing garbage collection (GC)")
   , ("create thread",   KEvent, createThreadColour,
      "Indicates a new Haskell thread has been created")
-  , ("seq GC req",      KEvent, seqGCReqColour,
-     "Indicates a HEC has requested to start a sequential GC")
-  , ("par GC req",      KEvent, parGCReqColour,
-     "Indicates a HEC has requested to start a parallel GC")
-  , ("migrate thread",  KEvent, migrateThreadColour,
-     "Indicates a Haskell thread has been moved from one HEC to another")
-  , ("thread wakeup",   KEvent, threadWakeupColour,
-     "Indicates that a thread that was previously blocked (e.g. I/O, MVar etc) is now ready to run")
-  , ("shutdown",        KEvent, shutdownColour,
-     "Indicates a HEC is terminating")
-  , ("user message",    KEvent, userMessageColour,
-     "Indicates a message generated from Haskell code (via traceEvent)")
-  , ("perf counter",    KEvent, createdConvertedColour,
-     "Indicates an update of a perf counter")
-  , ("perf tracepoint",    KEvent, shutdownColour,
-     "Indicates that a perf tracepoint was reached")
-  , ("create spark",    KEventAndGraph, createdConvertedColour,
-     "As an event it indicates a use of `par` resulted in a spark being " ++
-     "created (and added to the spark pool). In the spark creation " ++
-     "graph the coloured area represents the number of sparks created.")
-  , ("dud spark",       KEventAndGraph, fizzledDudsColour,
-     "As an event it indicates a use of `par` resulted in the spark being " ++
-     "discarded because it was a 'dud' (already evaluated). In the spark " ++
-     "creation graph the coloured area represents the number of dud sparks.")
-  , ("overflowed spark",KEventAndGraph, overflowedColour,
-     "As an event it indicates a use of `par` resulted in the spark being " ++
-     "discarded because the spark pool was full. In the spark creation " ++
-     "graph the coloured area represents the number of overflowed sparks.")
-  , ("run spark",       KEventAndGraph, createdConvertedColour,
-     "As an event it indicates a spark has started to be run/evaluated. " ++
-     "In the spark conversion graph the coloured area represents the number " ++
-     "of sparks run.")
-  , ("fizzled spark",   KEventAndGraph, fizzledDudsColour,
-     "As an event it indicates a spark has 'fizzled', meaning it has been " ++
-     "discovered that the spark's thunk was evaluated by some other thread. " ++
-     "In the spark conversion  graph the coloured area represents the number " ++
-     "of sparks that have fizzled.")
-  , ("GCed spark",      KEventAndGraph, gcColour,
-     "As an event it indicates a spark has been GC'd, meaning it has been " ++
-     "discovered that the spark's thunk was no longer needed anywhere. " ++
-     "In the spark conversion graph the coloured area represents the number " ++
-     "of sparks that were GC'd.")
 --BEGIN STM 
   , ("Start TX",        KEvent, seqGCReqColour, "Start TX Event")
   , ("Commit TX", KEvent, userMessageColour, "Commit TX Event")
@@ -115,7 +73,10 @@ keyData =
   , ("Eager Full Abort", KEvent, shutdownColour, "Eager Full Abort")
   , ("Commit Time Full Abort", KEvent, shutdownColour, "Eager Full Abort")
   , ("Log Validation", KEvent, parGCReqColour, "Log Validation")
+  , ("Fast Forward", KEvent, bookmarkColour, "Fast Forward")
 --END STM
+  , ("Major GC", KEvent, shutdownColour, "Major GC")
+  , ("Global GC", KEvent, threadWakeupColour, "Global GC")
   ]
 
 createKeyEntries :: DrawableClass dw

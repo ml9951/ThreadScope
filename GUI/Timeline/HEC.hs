@@ -278,8 +278,12 @@ drawEvent params@ViewParameters{..} ewidth perfNames event =
     CommitTimePartialAbort{} -> renderI fizzledDudsColour
     EagerFullAbort{} -> renderI shutdownColour
     CommitTimeFullAbort{} -> renderI shutdownColour
+    FastForward{} -> renderI bookmarkColour
     BeginCommit{} -> renderI parGCReqColour
 --END STM
+
+    MajorGC{} -> renderI shutdownColour
+    GlobalGC{} -> renderI threadWakeupColour
 
     UserMessage{}   -> renderI userMessageColour
 
