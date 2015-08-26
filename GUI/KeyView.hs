@@ -75,6 +75,7 @@ keyData =
   , ("Log Validation", KEvent, parGCReqColour, "Log Validation")
   , ("Fast Forward", KEvent, bookmarkColour, "Fast Forward")
 --END STM
+  , ("Remember Heap Object", KEvent, parGCReqColour, "Remember Heap Object")
   , ("Major GC", KEvent, shutdownColour, "Major GC")
   , ("Global GC", KEvent, threadWakeupColour, "Global GC")
   ]

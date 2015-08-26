@@ -34,7 +34,7 @@ zoom factor TimelineState{timelineAdj, scaleIORef} cursor = do
   -- TODO: we'd need HECs, as below, to fit maxScale to graphs at hand
   let maxScale = 10000000000  -- big enough for hours of eventlogs
       clampedFactor =
-        if factor scaleValue < 0.2 || factor scaleValue > maxScale
+        if factor scaleValue < 0.02 {-0.2-} || factor scaleValue > maxScale
         then id
         else factor
       newScaleValue = clampedFactor scaleValue

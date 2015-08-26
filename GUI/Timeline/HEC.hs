@@ -282,6 +282,8 @@ drawEvent params@ViewParameters{..} ewidth perfNames event =
     BeginCommit{} -> renderI parGCReqColour
 --END STM
 
+    RememberObj{} -> renderI parGCReqColour
+
     MajorGC{} -> renderI shutdownColour
     GlobalGC{} -> renderI threadWakeupColour
 
