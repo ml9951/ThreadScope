@@ -280,6 +280,7 @@ drawEvent params@ViewParameters{..} ewidth perfNames event =
     CommitTimeFullAbort{} -> renderI shutdownColour
     FastForward{} -> renderI bookmarkColour
     BeginCommit{} -> renderI parGCReqColour
+    TSExtension{} -> renderI seqGCReqColour
 --END STM
 
     RememberObj{} -> renderI parGCReqColour

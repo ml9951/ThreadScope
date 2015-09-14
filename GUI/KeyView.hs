@@ -74,6 +74,7 @@ keyData =
   , ("Commit Time Full Abort", KEvent, shutdownColour, "Eager Full Abort")
   , ("Log Validation", KEvent, parGCReqColour, "Log Validation")
   , ("Fast Forward", KEvent, bookmarkColour, "Fast Forward")
+  , ("Timestamp Extension", KEvent, seqGCReqColour, "Timestamp Extension")
 --END STM
   , ("Remember Heap Object", KEvent, parGCReqColour, "Remember Heap Object")
   , ("Major GC", KEvent, shutdownColour, "Major GC")
