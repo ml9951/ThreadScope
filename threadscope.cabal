@@ -55,7 +55,7 @@ Executable threadscope
                      Events.ReadEvents,
                      Events.SparkStats,
                      Events.SparkTree,
-                     Events.TestEvents,
+                --     Events.TestEvents,
                      GUI.Main,
                      GUI.MainWindow,
                      GUI.EventsView,

@@ -5,7 +5,7 @@ module GUI.SummaryView (
     summaryViewSetInterval,
   ) where
 
-import GHC.RTS.Events
+import qualified GHC.RTS.Events as E
 
 import GUI.Types
 
@@ -24,7 +24,7 @@ import Text.Printf
 
 ------------------------------------------------------------------------------
 
-type Events = Array Int CapEvent
+type Events = Array Int E.CapEvent
 
 data SummaryView = SummaryView {
 
@@ -142,7 +142,7 @@ summaryViewNew builder = do
 
 ------------------------------------------------------------------------------
 
-summaryViewSetEvents :: SummaryView -> Maybe (Array Int CapEvent) -> IO ()
+summaryViewSetEvents :: SummaryView -> Maybe (Array Int E.CapEvent) -> IO ()
 summaryViewSetEvents view@SummaryView{cacheEventsStats} Nothing = do
     writeIORef cacheEventsStats Nothing
     setSummaryStatsEmpty view
@@ -367,7 +367,7 @@ data SparkCounts = SparkCounts !Word64 !Word64 !Word64 !Word64 !Word64 !Word64
 --  * then look at that 'StatsAccum' record and construct the various final
 --    stats that we want to present.
 --
-summaryStats :: Array Int CapEvent -> Maybe Interval -> SummaryStats
+summaryStats :: Array Int E.CapEvent -> Maybe Interval -> SummaryStats
 summaryStats events minterval =
     SummaryStats {
        summHeapStats  = hs,
@@ -386,7 +386,7 @@ summaryStats events minterval =
 
 -- | Linearly accumulate the stats from the events array,
 -- either the full thing or some sub-range.
-accumStats :: Array Int CapEvent -> Maybe Interval -> StatsAccum
+accumStats :: Array Int E.CapEvent -> Maybe Interval -> StatsAccum
 accumStats events minterval =
     foldl' accumEvent start [ events ! i | i <- range eventsRange ]
   where
@@ -401,13 +401,13 @@ accumStats events minterval =
 -- indicies containing that interval. The Nothing interval means to select
 -- the whole array range.
 --
-selectEventRange :: Array Int CapEvent -> Maybe Interval -> (Int, Int)
+selectEventRange :: Array Int E.CapEvent -> Maybe Interval -> (Int, Int)
 selectEventRange arr Nothing             = bounds arr
 selectEventRange arr (Just (start, end)) = (lbound, ubound)
   where
     !lbound = either snd id $ findArrayRange cmp arr start
     !ubound = either fst id $ findArrayRange cmp arr end
-    cmp ts (CapEvent _ (Event ts' _)) = compare ts ts'
+    cmp ts (E.CapEvent _ (E.Event ts' _)) = compare ts ts'
 
     findArrayRange :: (key -> val -> Ordering)
                    -> Array Int val -> key -> Either (Int,Int) Int
@@ -427,7 +427,7 @@ selectEventRange arr (Just (start, end)) = (lbound, ubound)
 ------------------------------------------------------------------------------
 -- Final step where we convert from StatsAccum to various presentation forms
 
-timeStats :: Array Int CapEvent -> Maybe Interval -> GcStats -> TimeStats
+timeStats :: Array Int E.CapEvent -> Maybe Interval -> GcStats -> TimeStats
 timeStats events minterval
           GcStats { gcTotalStats = GcStatsEntry _ _ _ timeGC _ _ } =
     TimeStats {..}
@@ -443,7 +443,7 @@ timeStats events minterval
         Nothing    -> (0, timeOf (events ! ub))
           where
             (_lb, ub) = bounds events
-            timeOf (CapEvent _ (Event t _)) = t
+            timeOf (E.CapEvent _ (E.Event t _)) = t
 
 
 heapStats :: StatsAccum -> TimeStats -> HeapStats
@@ -691,8 +691,8 @@ emptyGenStat = GenStat
 errorAs :: String -> a -> a
 errorAs msg a = assert (error msg) a
 
-accumEvent :: StatsAccum -> CapEvent -> StatsAccum
-accumEvent !statsAccum (CapEvent mcap ev) =
+accumEvent :: StatsAccum -> E.CapEvent -> StatsAccum
+accumEvent !statsAccum (E.CapEvent mcap ev) =
   let -- For events that contain a counter with a running sum.
       -- Eventually we'll subtract the last found
       -- event from the first. Intervals beginning at time 0
@@ -713,7 +713,7 @@ accumEvent !statsAccum (CapEvent mcap ev) =
       alterMax n (Just k) | n > k = Just n
       alterMax _ jk = jk
       -- Scan events, updating summary data.
-      scan cap !sd@StatsAccum{..} Event{time, spec} =
+      scan cap !sd@StatsAccum{..} E.Event{time, spec} =
         let capGC = IM.findWithDefault (defaultGC time) cap dGCTable
         in case spec of
           -- TODO: check EventBlock elsewhere; define {map,fold}EventBlock

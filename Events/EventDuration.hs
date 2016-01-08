@@ -87,11 +87,15 @@ durationOf :: EventDuration -> Timestamp
 durationOf ed = endTimeOf ed - startTimeOf ed
 
 -------------------------------------------------------------------------------
-
+{-
 eventsToDurations :: [GHC.Event] -> [EventDuration]
 eventsToDurations [] = []
 eventsToDurations (event : events) =
   case spec event of
+     VProcStart{vp=t} -> runDuration t : rest
+     StartGC
+  
+
      RunThread{thread=t} -> runDuration t : rest
      StopThread{}  -> rest
      StartGC       -> gcStart (time event) events
@@ -106,44 +110,57 @@ eventsToDurations (event : events) =
        where (endTime, s) = case findRunThreadTime events of
                               Nothing -> (time event, NoStatus)   --   error $ "findRunThreadTime for " ++ (show event)
                               Just x -> x
+-}
+
+eventsToDurations' :: [GHC.Event] -> (GHC.Event, [EventDuration])
+eventsToDurations' (event : events) =
+  case spec event of
+       VProcExit{} -> (event, [])
+       MinorGCStart _ -> (event, gcStart (time event) events)
+       _ -> eventsToDurations' events
+  where
+        runDuration t = ThreadRun t NoStatus (time event) (time e) : rest
+        (e, rest) = eventsToDurations' events
+
+eventsToDurations :: [GHC.Event] -> [EventDuration]
+eventsToDurations (event : events) =
+  case spec event of
+       VProcStart{} -> runDuration t
+       _ -> eventsToDurations events
+  where
+        runDuration t = ThreadRun t NoStatus (time event) (time e) : rest
+        (e, rest) = eventsToDurations' events
+
+
 
 isDiscreteEvent :: GHC.Event -> Bool
 isDiscreteEvent e =
   case spec e of
-    RunThread{}  -> False
-    StopThread{} -> False
-    StartGC{}    -> False
-    EndGC{}      -> False
- --   StartTX{}    -> False
-  --  CommitTX{}   -> False
-    GHC.GCWork{} -> False
-    GHC.GCIdle{} -> False
-    GHC.GCDone{} -> False
-    GHC.SparkCounters{} -> False
-    _            -> True
-
-txStart :: Timestamp -> [GHC.Event] -> [EventDuration]
-txStart _ [] = []
-txStart t0 (event : events) = 
-  case spec event of
-    GHC.CommitTX{} -> TXStart t0 t1 : eventsToDurations events
-    _other         -> gcStart t0 events
-  where
-      t1 = time event
+    VProcStart{} -> False
+    VProcExit{} -> False
+    MinorGCStart{} -> False
+    MinorGCEnd{} -> False
+    _ -> True
+    
 
 gcStart :: Timestamp -> [GHC.Event] -> [EventDuration]
 gcStart _  [] = []
 gcStart t0 (event : events) =
   case spec event of
+    MinorGCEnd{} ->
+      let (e, rest) = eventsToDurations' events
+      in GCStart t0 t1 : ThreadRun 0 NoStatus (time event) (time e) : eventsToDurations events
+{-
     GHC.GCWork{} -> GCStart t0 t1 : gcWork t1 events
     GHC.GCIdle{} -> GCStart t0 t1 : gcIdle t1 events
     GHC.GCDone{} -> GCStart t0 t1 : gcDone t1 events
     GHC.EndGC{}  -> GCStart t0 t1 : eventsToDurations events
-    RunThread{}  -> GCStart t0 t1 : eventsToDurations (event : events)
+    RunThread{}  -> GCStart t0 t1 : eventsToDurations (event : events) -}
     _other       -> gcStart t0 events
  where
         t1 = time event
 
+{-
 gcWork :: Timestamp -> [GHC.Event] -> [EventDuration]
 gcWork _  [] = []
 gcWork t0 (event : events) =
@@ -191,5 +208,5 @@ findRunThreadTime (e : es)
   = case spec e of
       StopThread{status=s} -> Just (time e, s)
       _                    -> findRunThreadTime es
-
+-}
 -------------------------------------------------------------------------------

@@ -5,7 +5,7 @@ module Events.ReadEvents (
 import Events.EventTree
 import Events.SparkTree
 import Events.HECs (HECs(..), histogram)
-import Events.TestEvents
+--import Events.TestEvents
 import Events.EventDuration
 import qualified GUI.ProgressView as ProgressView
 import GUI.ProgressView (ProgressView)
@@ -103,7 +103,7 @@ buildEventLog :: ProgressView -> Either FilePath String
               -> IO (HECs, String, Int, Double)
 buildEventLog progress from =
   case from of
-    Right test     -> build test (testTrace test)
+  --  Right test     -> build test (testTrace test)
     Left filename  -> do
       stopPulse <- ProgressView.startPulse progress
       fmt <- readEventLogFromFile filename
